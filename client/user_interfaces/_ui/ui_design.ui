@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>876</width>
+    <height>392</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Поиск фотографий</string>
+  </property>
+  <property name="animated">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::NoContextMenu</enum>
+   </property>
+   <widget class="QPushButton" name="uielem_startSearch">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>330</y>
+      <width>75</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Поиск</string>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="uielem_progressBar">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>330</y>
+      <width>781</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="ui_hairTypeComboBox">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>20</y>
+      <width>141</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Нормальные</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Жирные</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Сухие</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Смешанные (жирные у корней, сухие на кончиках)</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="ui_hairTypeLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Выберите свой тип волос:</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="ui_hairTypeDescriptionTable">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>861</width>
+      <height>241</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Sunken</enum>
+    </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QAbstractScrollArea::AdjustIgnored</enum>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <property name="tabKeyNavigation">
+     <bool>false</bool>
+    </property>
+    <property name="showDropIndicator" stdset="0">
+     <bool>false</bool>
+    </property>
+    <property name="dragDropOverwriteMode">
+     <bool>false</bool>
+    </property>
+    <property name="alternatingRowColors">
+     <bool>true</bool>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::NoSelection</enum>
+    </property>
+    <property name="textElideMode">
+     <enum>Qt::ElideRight</enum>
+    </property>
+    <property name="showGrid">
+     <bool>true</bool>
+    </property>
+    <property name="gridStyle">
+     <enum>Qt::SolidLine</enum>
+    </property>
+    <property name="sortingEnabled">
+     <bool>false</bool>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+    <property name="cornerButtonEnabled">
+     <bool>false</bool>
+    </property>
+    <attribute name="horizontalHeaderCascadingSectionResizes">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="horizontalHeaderHighlightSections">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderVisible">
+     <bool>true</bool>
+    </attribute>
+    <attribute name="verticalHeaderCascadingSectionResizes">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderDefaultSectionSize">
+     <number>30</number>
+    </attribute>
+    <attribute name="verticalHeaderHighlightSections">
+     <bool>false</bool>
+    </attribute>
+    <row>
+     <property name="text">
+      <string>Потребность в мытье</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Кожа головы, корни волос</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Кончики (при средней длине волос)</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Блеск</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Пышность и объем</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Электризация</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>Укладка без стайлинговых средств</string>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>Нормальные</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Жирные</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Сухие</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Смешанные (жирные у корней, сухие на кончиках)</string>
+     </property>
+    </column>
+    <item row="0" column="0">
+     <property name="text">
+      <string>Каждые  2 – 3 дня</string>
+     </property>
+    </item>
+    <item row="0" column="1">
+     <property name="text">
+      <string>Ежедневно</string>
+     </property>
+    </item>
+    <item row="0" column="2">
+     <property name="text">
+      <string>Один раз в неделю</string>
+     </property>
+    </item>
+    <item row="0" column="3">
+     <property name="text">
+      <string>Каждые  2 – 4 дня</string>
+     </property>
+    </item>
+    <item row="1" column="0">
+     <property name="text">
+      <string>После мытья нормальные,
+через пару дней  жирные</string>
+     </property>
+    </item>
+    <item row="1" column="1">
+     <property name="text">
+      <string>После мытья нормальные, вечером первого дня или утром второго снова жирные</string>
+     </property>
+    </item>
+    <item row="1" column="2">
+     <property name="text">
+      <string>После мытья – сухие или нормальные, 3-4 дня нормальные, к 7-му дню — жирные</string>
+     </property>
+    </item>
+    <item row="1" column="3">
+     <property name="text">
+      <string>После мытья нормальные, через 2-3 дня  жирные</string>
+     </property>
+    </item>
+    <item row="2" column="0">
+     <property name="text">
+      <string>Нормальные или чуть сухие, могут немного сечься кончики</string>
+     </property>
+    </item>
+    <item row="2" column="1">
+     <property name="text">
+      <string>Не секутся или почти не секутся</string>
+     </property>
+    </item>
+    <item row="2" column="2">
+     <property name="text">
+      <string>Сухие, ломкие, может быть много обломанных или секущихся кончиков</string>
+     </property>
+    </item>
+    <item row="2" column="3">
+     <property name="text">
+      <string>Сухие, секутся</string>
+     </property>
+    </item>
+    <item row="3" column="0">
+     <property name="text">
+      <string>После мытья – чистый блеск,  через 2-3 дня – жирный блеск у корней</string>
+     </property>
+    </item>
+    <item row="3" column="1">
+     <property name="text">
+      <string>Чистый блеск после мытья, жирный блеск к концу первого дня или утру второго</string>
+     </property>
+    </item>
+    <item row="3" column="2">
+     <property name="text">
+      <string>После мытья – легкий блеск, затем волосы тускнеют</string>
+     </property>
+    </item>
+    <item row="3" column="3">
+     <property name="text">
+      <string>После мытья  чистый блеск у корней, небольшой блеск – на кончиках. На 3-4 день – жирный блеск у корней и отсутствие блеска на кончиках</string>
+     </property>
+    </item>
+    <item row="4" column="0">
+     <property name="text">
+      <string>Нормальная пышность</string>
+     </property>
+    </item>
+    <item row="4" column="1">
+     <property name="text">
+      <string>Только сразу после мытья или совсем нет</string>
+     </property>
+    </item>
+    <item row="4" column="2">
+     <property name="text">
+      <string>Усиленная</string>
+     </property>
+    </item>
+    <item row="4" column="3">
+     <property name="text">
+      <string>Средняя, могут пушиться кончики</string>
+     </property>
+    </item>
+    <item row="5" column="0">
+     <property name="text">
+      <string>Иногда</string>
+     </property>
+    </item>
+    <item row="5" column="1">
+     <property name="text">
+      <string>Очень редко</string>
+     </property>
+    </item>
+    <item row="5" column="2">
+     <property name="text">
+      <string>Часто</string>
+     </property>
+    </item>
+    <item row="5" column="3">
+     <property name="text">
+      <string>Может быть на кончиках</string>
+     </property>
+    </item>
+    <item row="6" column="0">
+     <property name="text">
+      <string>Поддаются хорошо</string>
+     </property>
+    </item>
+    <item row="6" column="1">
+     <property name="text">
+      <string>Волосы поддаются укладке, но она держится недолго</string>
+     </property>
+    </item>
+    <item row="6" column="2">
+     <property name="text">
+      <string>Плохо поддаются укладке</string>
+     </property>
+    </item>
+    <item row="6" column="3">
+     <property name="text">
+      <string>Прикорневая укладка</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="ui_hairColorLabel">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>20</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Выберите цвет волос:</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="ui_hairColorComboBox">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>20</y>
+      <width>121</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Красный</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Оранжевый</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Желтый</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Зеленый</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Голубой</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Синий</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Фиолетовый</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Розовый</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="ui_hairLengthComboBox">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>20</y>
+      <width>161</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Без волос</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Короткие</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Средние</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Длинные</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="ui_hairLengthLabel">
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>20</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Выберите длину волос:</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

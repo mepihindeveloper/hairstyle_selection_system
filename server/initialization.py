@@ -36,6 +36,7 @@ class Initialization:
         'path_to_men_hairstyles': "/men",
         'path_to_women_hairstyles': "/women",
         'hair_types': ["normal", "greasy", "dry", "mixed"],
+        'database': './database/main_db.db',
         'debug': False
     }
 
@@ -48,7 +49,7 @@ class Initialization:
 
     # Функция уставновки соединения с БД
     def __init_connection(self):
-        self.connection = sqlite3.connect('./database/main_db.db')
+        self.connection = sqlite3.connect(self.params.get('database'))
         self.cursor = self.connection.cursor()
 
     # Функция разрыва соединения

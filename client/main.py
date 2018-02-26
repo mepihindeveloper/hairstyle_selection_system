@@ -17,7 +17,6 @@ class ServerFunction:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         result = self.sock.connect_ex(('localhost', 10000))
         if result:
-            pass
             return {"status": False, "message": "Подключение к серверу отсутствует.\nСервер временно выключен"}
 
     # Функция закрытия соединения
@@ -34,7 +33,7 @@ class ServerFunction:
         :return: Ответ от сервера
         '''
 
-        self.sock.sendall(bytes("{};{}".format(command, data), 'utf-8'))
+        self.sock.sendall(bytes("{}=>{}".format(command, data), 'utf-8'))
         return self.sock.recv(1024).decode()
 
     #  Функцмя проверка статуса лицензии
@@ -66,3 +65,6 @@ class ServerFunction:
             return {"status": True, "message": "Лицензия подтверждена"}
         else:
             return {"status": False, "message": "У вас нет лицензии!"}
+
+s = ServerFunction()
+print (s.get_license_status())

@@ -26,17 +26,13 @@ class __Handler(socketserver.BaseRequestHandler):
         # Устанавливаем соединение
         self.__connection()
 
-        self.cursor.execute("SELECT * FROM clients WHERE license_key = '%s'" % license_key)
-        row = self.cursor.fetchone()
-        if row is not None:
-            if rating == "y":
-                new_rating = row[3] + 1
-                self.cursor.execute("UPDATE clients SET yes = '%i' WHERE license_key = '%s' " % (new_rating, license_key))
-            else:
-                new_rating = row[4] + 1
-                self.cursor.execute("UPDATE clients SET no = '%i' WHERE license_key = '%s' " % (new_rating, license_key))
+        date_now = datetime.datetime.now()
+        self.cursor.execute(
+            "UPDATE statistics SET " + rating + " = " + rating + " + 1 WHERE date = '{}'-".format(
+                date_now.strftime("%Y-%m-%d"))
+        )
+        self.connection.commit()
 
-            self.connection.commit()
         # Отключение
         self.__disconnect()
 
@@ -47,35 +43,33 @@ class __Handler(socketserver.BaseRequestHandler):
 
         while row is not None:
             if row[1] == license_key:
-                reg_date = datetime.datetime.strptime("2016-12-06", "%Y-%m-%d").date()
+                reg_date = datetime.datetime.strptime(row[2], "%Y-%m-%d").date()
                 if reg_date.year > datetime.datetime.today().year + 1 and reg_date.month == datetime.datetime.today().month \
                         and reg_date.day == datetime.datetime.today().day:
-                    # закрываем соединение с базой
-                    self.__disconnect()
                     return False
                 else:
-                    # закрываем соединение с базой
-                    self.__disconnect()
                     return True
             row = self.cursor.fetchone()
 
     def handle(self):
-        self.data = self.request.recv(1024).decode('utf-8')
-        print('Клиент {} отпрвил сообщение: {}'.format(self.client_address[0], self.data))
-
         while True:
-            data_parts = self.data.split(';')
-            if data_parts[0] == 'CHECK_LICENSE':
-                result = self.get_license_status(data_parts[1])
-                if result is True:
-                    self.request.send(bytes('VERIFIED', 'utf-8'))
-                else:
-                    self.request.send(bytes('NOT_VERIFIED', 'utf-8'))
-            elif data_parts[0] == 'GOODBYE':
-                print ('Разрыв соединения с ', self.client_address[0])
-                self.__disconnect()
-                break
+            self.data = self.request.recv(1024).decode('utf-8')
+            print('Клиент {} отпрвил сообщение: {}'.format(self.client_address, self.data))
 
+            if self.data:
+                data_parts = self.data.split('=>')
+                if data_parts[0] == 'CHECK_LICENSE':
+                    result = self.get_license_status(data_parts[1])
+                    if result is True:
+                        self.request.send(bytes('VERIFIED', 'utf-8'))
+                    else:
+                        self.request.send(bytes('NOT_VERIFIED', 'utf-8'))
+                elif data_parts[0] == 'GOODBYE':
+                    break
+            else:
+                break
+        print('Разрыв соединения с ', self.client_address[0])
+        self.__disconnect()
         # if self.data == 'CONNECTED':
         #     self.request.sendall(bytes('OK', 'utf-8'))
         #     while True:

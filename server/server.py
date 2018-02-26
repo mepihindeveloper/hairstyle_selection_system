@@ -59,6 +59,7 @@ class __Handler(socketserver.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024).decode()
         _CLIENTS.append(self.client_address)
+        print (self.client_address)
         print('Client {} reports: {}'.format(self.client_address[0], self.data))
 
         if self.data == 'CONNECTED':
@@ -73,7 +74,7 @@ class __Handler(socketserver.BaseRequestHandler):
                     self.request.sendall(bytes('WRITED', 'utf-8'))
                 elif resp[0] == 'CHECK_LICENSE':
                     result = self._check_license(resp[1])
-                    if result == True:
+                    if result is True:
                         self.request.sendall(bytes('VERIFIED', 'utf-8'))
                     else:
                         self.request.sendall(bytes('NOT_VERIFIED', 'utf-8'))

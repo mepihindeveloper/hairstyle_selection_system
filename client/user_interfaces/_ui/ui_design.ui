@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>876</width>
-    <height>392</height>
+    <width>987</width>
+    <height>643</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,7 +20,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Поиск фотографий</string>
+   <string>Система подбора причесок</string>
   </property>
   <property name="animated">
    <bool>false</bool>
@@ -36,11 +36,14 @@
     <enum>Qt::NoContextMenu</enum>
    </property>
    <widget class="QPushButton" name="uielem_startSearch">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>330</y>
-      <width>75</width>
+      <y>580</y>
+      <width>111</width>
       <height>31</height>
      </rect>
     </property>
@@ -51,9 +54,9 @@
    <widget class="QProgressBar" name="uielem_progressBar">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>330</y>
-      <width>781</width>
+      <x>130</x>
+      <y>580</y>
+      <width>841</width>
       <height>31</height>
      </rect>
     </property>
@@ -64,10 +67,10 @@
    <widget class="QComboBox" name="ui_hairTypeComboBox">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>20</y>
-      <width>141</width>
-      <height>22</height>
+      <x>230</x>
+      <y>10</y>
+      <width>231</width>
+      <height>41</height>
      </rect>
     </property>
     <item>
@@ -87,7 +90,7 @@
     </item>
     <item>
      <property name="text">
-      <string>Смешанные (жирные у корней, сухие на кончиках)</string>
+      <string>Смешанные</string>
      </property>
     </item>
    </widget>
@@ -96,7 +99,7 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>141</width>
+      <width>201</width>
       <height>16</height>
      </rect>
     </property>
@@ -108,9 +111,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>80</y>
-      <width>861</width>
-      <height>241</height>
+      <y>140</y>
+      <width>961</width>
+      <height>431</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -228,7 +231,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Смешанные (жирные у корней, сухие на кончиках)</string>
+      <string>Смешанные</string>
      </property>
     </column>
     <item row="0" column="0">
@@ -376,9 +379,9 @@
    <widget class="QLabel" name="ui_hairColorLabel">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>510</x>
       <y>20</y>
-      <width>141</width>
+      <width>201</width>
       <height>16</height>
      </rect>
     </property>
@@ -389,10 +392,10 @@
    <widget class="QComboBox" name="ui_hairColorComboBox">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>20</y>
-      <width>121</width>
-      <height>22</height>
+      <x>730</x>
+      <y>10</y>
+      <width>231</width>
+      <height>41</height>
      </rect>
     </property>
     <item>
@@ -402,22 +405,32 @@
     </item>
     <item>
      <property name="text">
-      <string>Оранжевый</string>
+      <string>Красно-оранжевый</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Желтый</string>
+      <string>Розово-красный</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Зеленый</string>
+      <string>Розовый</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Голубой</string>
+      <string>Пурпурно-розовый</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Пурпурный</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Сине-фиолетовый</string>
      </property>
     </item>
     <item>
@@ -427,29 +440,54 @@
     </item>
     <item>
      <property name="text">
-      <string>Фиолетовый</string>
+      <string>Циан-синий</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Розовый</string>
+      <string>Циан</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Зеленый-циан</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Зеленый</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Желто-зеленый</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Желтый</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Оранжево-желтый</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Оранжево-коричневый</string>
      </property>
     </item>
    </widget>
    <widget class="QComboBox" name="ui_hairLengthComboBox">
     <property name="geometry">
      <rect>
-      <x>700</x>
-      <y>20</y>
-      <width>161</width>
-      <height>22</height>
+      <x>230</x>
+      <y>60</y>
+      <width>231</width>
+      <height>41</height>
      </rect>
     </property>
-    <item>
-     <property name="text">
-      <string>Без волос</string>
-     </property>
-    </item>
     <item>
      <property name="text">
       <string>Короткие</string>
@@ -469,14 +507,59 @@
    <widget class="QLabel" name="ui_hairLengthLabel">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>20</y>
-      <width>141</width>
-      <height>16</height>
+      <x>10</x>
+      <y>70</y>
+      <width>201</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Выберите длину волос:</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>70</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Мужчина</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton_2">
+    <property name="geometry">
+     <rect>
+      <x>850</x>
+      <y>70</y>
+      <width>112</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Женщина</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="ui_hairColorLabel_2">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>70</y>
+      <width>201</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Выберите ваш пол:</string>
     </property>
    </widget>
   </widget>

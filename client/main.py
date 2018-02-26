@@ -91,19 +91,14 @@ class ServerFunction:
             return {"status": False, "message": "Произошла ошибки при оценке!"}
 
     # Функция для получения списка фотографий выборки
-    def get_templates(self, params=[]):
+    def get_templates(self, params={}):
         result = self.__connection()
         if result.get("status") is not True:
             return result
 
         received = self.__send_data(data={
             'command': 'GET_TEMPLATES',
-            'message': {
-                'hair_type': 'mixed',
-                'hair_length': 'long',
-                'hair_color': 'Orange-Brown',
-                'gender': 'women',
-            }
+            'message': params
         })
         self.__disconnect()
 
@@ -116,7 +111,8 @@ if __name__ == "__main__":
     if result.get("status") is not True:
         ShowWindow.show_error_win(error_message=result.get("message"))
     else:
-        ShowWindow.show_vote_win(server_class=server_class)
+        #ShowWindow.show_vote_win(server_class=server_class)
+        ShowWindow.show_main_win(server_class=server_class)
 
     #print(server_class.get_templates(params=['mixed', 'long', 'Orange-Brown', 'women']))
 

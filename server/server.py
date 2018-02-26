@@ -2,9 +2,6 @@ import socketserver
 import sqlite3
 import datetime
 
-_HOST = 'localhost'
-_PORT = 10000
-
 
 class __Handler(socketserver.BaseRequestHandler):
     params = {
@@ -22,19 +19,29 @@ class __Handler(socketserver.BaseRequestHandler):
         self.cursor.close()
         self.connection.close()
 
-    def __add_rating_to_db(self, rating, license_key):
+    def __add_rating_to_db(self, rating, service):
         # Устанавливаем соединение
         self.__connection()
-
         date_now = datetime.datetime.now()
+
         self.cursor.execute(
-            "UPDATE statistics SET " + rating + " = " + rating + " + 1 WHERE date = '{}'-".format(
+            "SELECT * FROM statistics WHERE date = '{}'".format(
                 date_now.strftime("%Y-%m-%d"))
         )
-        self.connection.commit()
+        row = self.cursor.fetchone()
+        if row is None:
+            self.cursor.execute(
+                "INSERT INTO statistics (date, service) VALUES ('{}', '{}')".format(
+                    date_now.strftime("%Y-%m-%d"),
+                    service
+            ))
 
-        # Отключение
-        self.__disconnect()
+        else:
+            self.cursor.execute(
+                "UPDATE statistics SET " + rating + " = " + rating + " + 1 WHERE date = '{}'".format(
+                    date_now.strftime("%Y-%m-%d"))
+            )
+        self.connection.commit()
 
     def get_license_status(self, license_key):
         self.__connection()
@@ -43,12 +50,24 @@ class __Handler(socketserver.BaseRequestHandler):
 
         while row is not None:
             if row[1] == license_key:
+                # Получаем дату регистрации продукта
                 reg_date = datetime.datetime.strptime(row[2], "%Y-%m-%d").date()
-                if reg_date.year > datetime.datetime.today().year + 1 and reg_date.month == datetime.datetime.today().month \
-                        and reg_date.day == datetime.datetime.today().day:
-                    return False
-                else:
+
+                # Получаем текущую дату в формате "%Y-%m-%d"
+                year = datetime.datetime.now().year
+                month = datetime.datetime.now().month
+                day = datetime.datetime.now().day
+                current_date = datetime.datetime.strptime("{}-{}-{}".format(year, month, day), "%Y-%m-%d").date()
+
+                # Считаем разницу в днях
+                different_of_dates = str(current_date - reg_date).split()[0]
+                different_of_dates = int(different_of_dates)
+
+                if 0 <= different_of_dates <= 365:
                     return True
+                else:
+                    return False
+
             row = self.cursor.fetchone()
 
     def handle(self):
@@ -66,35 +85,15 @@ class __Handler(socketserver.BaseRequestHandler):
                         self.request.send(bytes('NOT_VERIFIED', 'utf-8'))
                 elif data_parts[0] == 'GOODBYE':
                     break
+                elif data_parts[0] == 'RATING':
+                    self.__add_rating_to_db(data_parts[1], data_parts[2])
+                    self.request.send(bytes('RATING-ADDED', 'utf-8'))
             else:
                 break
         print('Разрыв соединения с ', self.client_address[0])
         self.__disconnect()
-        # if self.data == 'CONNECTED':
-        #     self.request.sendall(bytes('OK', 'utf-8'))
-        #     while True:
-        #         self.data = self.request.recv(1024).decode()
-        #         resp = self.data.split(';')
-        #         print(resp)
-        #
-        #         if resp[0] == 'TRY':
-        #             self.__add_rating_to_db(resp[1], resp[2])
-        #             self.request.sendall(bytes('WRITED', 'utf-8'))
-        #         elif resp[0] == 'CHECK_LICENSE':
-        #             result = self.get_license_status(resp[1])
-        #             if result is True:
-        #                 self.request.sendall(bytes('VERIFIED', 'utf-8'))
-        #             else:
-        #                 self.request.sendall(bytes('NOT_VERIFIED', 'utf-8'))
-        #         elif resp[0] == 'GOODBYE':
-        #             break
-        #         else:
-        #             print('Unknown request from the user.')
-        #             break
-        # else:
-        #     print('Unknown request from a client.')
 
 
-server = socketserver.TCPServer((_HOST, _PORT), __Handler)
+server = socketserver.TCPServer(('localhost', 10000), __Handler)
 print('Сервер запущен')
 server.serve_forever()

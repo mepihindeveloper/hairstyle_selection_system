@@ -25,7 +25,7 @@ class ServerFunction:
         self.sock.close()
 
     # Функция отправки даных на сервер
-    def __send_data(self, command, data):
+    def __send_data(self, command, data=[]):
         '''
 
         :param command: Команда для сервера, находящаяся перед разделителем ";"
@@ -33,10 +33,16 @@ class ServerFunction:
         :return: Ответ от сервера
         '''
 
+        # В случае, если данных для команды много, то формируем запрос иначе
+        if len(data) > 1:
+            data = '=>'.join(data)
+        else:
+            data = data[0]
+
         self.sock.sendall(bytes("{}=>{}".format(command, data), 'utf-8'))
         return self.sock.recv(1024).decode()
 
-    #  Функцмя проверка статуса лицензии
+    #  Функция проверка статуса лицензии
     def get_license_status(self):
         global license_key
 
@@ -58,7 +64,7 @@ class ServerFunction:
 
         # Так как установлено соединение с сервером, то необходимо проверить лицензию по ключу
         # Если срок не истек, то разрешаем пользоваться программой, иначе выходим из программы
-        received = self.__send_data('CHECK_LICENSE', license_key)
+        received = self.__send_data('CHECK_LICENSE', [license_key])
 
         if received == "VERIFIED":
             self.__disconnect()
@@ -66,5 +72,20 @@ class ServerFunction:
         else:
             return {"status": False, "message": "У вас нет лицензии!"}
 
+    # Функция оценки результатов
+    def set_rating(self, rating='positive'):
+        global license_key
+        # Выполняем подключение к базе данных
+        if self.__connection():
+            return {"status": False, "message": "Подключение к серверу отсутствует.\nСервер временно выключен"}
+
+        received = self.__send_data('RATING', [rating, 'haircut'])
+        if received == 'RATING-ADDED':
+            return {"status": True, "message": "Спасибо за оценку!\nГолос учтен"}
+        else:
+            return {"status": False, "message": "Произошла ошибки при оценке!"}
+
+
 s = ServerFunction()
-print (s.get_license_status())
+print(s.get_license_status())
+print(s.set_rating('negative'))

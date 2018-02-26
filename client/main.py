@@ -108,11 +108,12 @@ if __name__ == "__main__":
     server_class = ServerFunction()
     result = server_class.get_license_status()
 
-    if result.get("status") is not True:
-        ShowWindow.show_error_win(error_message=result.get("message"))
-    else:
-        #ShowWindow.show_vote_win(server_class=server_class)
-        ShowWindow.show_main_win(server_class=server_class)
-
+    # if result.get("status") is not True:
+    #     ShowWindow.show_error_win(error_message=result.get("message"))
+    # else:
+    #     #ShowWindow.show_vote_win(server_class=server_class)
+    #     ShowWindow.show_main_win(server_class=server_class)
+    #
+    ShowWindow.show_gallery_win()
     #print(server_class.get_templates(params=['mixed', 'long', 'Orange-Brown', 'women']))
 

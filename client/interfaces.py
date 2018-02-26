@@ -1,9 +1,10 @@
-import sys
+import sys, os
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from .user_interfaces._py.ui_design import *
-from .user_interfaces._py.ui_vote_dialog import *
-from .user_interfaces._py.ui_error_dialog import *
+from .user_interfaces._py.ui_design import Ui_MainWindow
+from .user_interfaces._py.ui_vote_dialog import Ui_VoteDialog
+from .user_interfaces._py.ui_error_dialog import Ui_ErrorDialog
+from .user_interfaces._py.ui_listviewimages import Ui_ListViewWindow
 
 
 '''
@@ -180,6 +181,43 @@ class MainWin(QtWidgets.QMainWindow):
         # self.window.show()
 
 
+class GalleryWin(QtWidgets.QMainWindow):
+    def __init__(self, parent=None):
+        QtWidgets.QWidget.__init__(self, parent)
+        self.ui = Ui_ListViewWindow()
+        self.ui.setupUi(self)
+
+        # Отключаем возможность изменения разамера окна
+        self.setFixedSize(self.size())
+        # Настрока размеров
+        self.ui.listWidget.setGridSize(QtCore.QSize(300,300))
+        self.ui.listWidget.setUniformItemSizes(True)
+        # Отключение Drag And Drop
+        self.ui.listWidget.setDragDropMode(QtWidgets.QAbstractItemView.NoDragDrop)
+        self.setAcceptDrops(False)
+
+        #self.ui.listWidget.itemClicked.connect(self.item_click)
+
+        dir_and_subdir_templates = [
+            os.path.join("../server/hairstyle_images/women", name)
+            for dir_path, dirs, files in
+            os.walk("../server/hairstyle_images/women")
+            for name in files
+            if name.endswith((".jpg", ".png", ".jpeg"))
+        ]
+
+        for url in dir_and_subdir_templates:
+            icon = QtGui.QIcon(url)
+            pixmap = icon.pixmap(150, 150)
+            icon = QtGui.QIcon(pixmap)
+            item = QtWidgets.QListWidgetItem(url)
+            item.setIcon(icon)
+            self.ui.listWidget.addItem(QtWidgets.QListWidgetItem(item))
+
+    # def item_click(self, item):
+    #     print(str(item.text()))
+
+
 '''
     Основной класс для манипуляций со всеми окнами приложения
 '''
@@ -204,5 +242,12 @@ class ShowWindow:
     def show_main_win(server_class):
         app = QtWidgets.QApplication(sys.argv)
         my_app = MainWin(server_class=server_class)
+        my_app.show()
+        sys.exit(app.exec_())
+
+    @staticmethod
+    def show_gallery_win():
+        app = QtWidgets.QApplication(sys.argv)
+        my_app = GalleryWin()
         my_app.show()
         sys.exit(app.exec_())

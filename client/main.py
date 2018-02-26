@@ -1,4 +1,5 @@
 import socket
+from client.interfaces import ShowWindow
 
 license_key = None
 
@@ -86,6 +87,12 @@ class ServerFunction:
             return {"status": False, "message": "Произошла ошибки при оценке!"}
 
 
-s = ServerFunction()
-print(s.get_license_status())
-print(s.set_rating('negative'))
+if __name__ == "__main__":
+    app = my_app = None
+    server_class = ServerFunction()
+    result = server_class.get_license_status()
+
+    if result.get("status") is not True:
+        ShowWindow.show_error_win(error_message=result.get("message"))
+    else:
+        ShowWindow.show_vote_win(server_class=server_class)

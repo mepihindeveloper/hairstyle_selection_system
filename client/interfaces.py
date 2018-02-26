@@ -46,7 +46,6 @@ class VoteWin(QtWidgets.QMainWindow):
         self.ui.uielem_noButton.clicked.connect(self.vote_no)
 
 
-
     # Функция голосования за положительный резуальтат работы программы
     def vote_yes(self):
         result = self.server_class.set_rating()

@@ -1,6 +1,7 @@
 import socketserver
 import sqlite3
 import datetime
+import pickle
 
 
 class __Handler(socketserver.BaseRequestHandler):
@@ -70,24 +71,69 @@ class __Handler(socketserver.BaseRequestHandler):
 
             row = self.cursor.fetchone()
 
+    def get_templates(self, hair_type, hair_length, hair_color, gender):
+        self.__connection()
+        self.cursor.execute(
+            "SELECT path_to_image FROM hairstyle_images "
+            "WHERE hair_type = '{}' AND hair_length = '{}' AND hair_color = '{}' AND gender = '{}'".format(
+                hair_type,
+                hair_length,
+                hair_color,
+                gender
+            )
+        )
+        row = self.cursor.fetchone()
+        templates = []
+        while row is not None:
+            templates.append(row[0])
+            row = self.cursor.fetchone()
+
+        return templates
+
     def handle(self):
         while True:
-            self.data = self.request.recv(1024).decode('utf-8')
-            print('Клиент {} отпрвил сообщение: {}'.format(self.client_address, self.data))
+            self.data = pickle.loads(self.request.recv(4096))
+
+            print('Клиент {} отпрвил сообщение: {}'.format(
+                self.client_address, self.data)
+            )
 
             if self.data:
-                data_parts = self.data.split('=>')
-                if data_parts[0] == 'CHECK_LICENSE':
-                    result = self.get_license_status(data_parts[1])
+                if self.data.get("command") == 'CHECK_LICENSE':
+                    result = self.get_license_status(
+                        self.data.get("message").get("license_key")
+                    )
                     if result is True:
-                        self.request.send(bytes('VERIFIED', 'utf-8'))
+                        self.request.send(pickle.dumps({
+                            'command': 'VERIFIED'
+                        }))
                     else:
-                        self.request.send(bytes('NOT_VERIFIED', 'utf-8'))
-                elif data_parts[0] == 'GOODBYE':
+                        self.request.send(pickle.dumps({
+                            'command': 'NOT_VERIFIED'
+                        }))
+                elif self.data.get("command") == 'GOODBYE':
                     break
-                elif data_parts[0] == 'RATING':
-                    self.__add_rating_to_db(data_parts[1], data_parts[2])
-                    self.request.send(bytes('RATING-ADDED', 'utf-8'))
+                elif self.data.get("command") == 'RATING':
+                    self.__add_rating_to_db(
+                        self.data.get("message").get("rating"),
+                        self.data.get("message").get("service")
+                    )
+                    self.request.send(pickle.dumps({
+                        'command': 'RATING-ADDED'
+                    }))
+                elif self.data.get("command") == 'GET_TEMPLATES':
+                    result = self.get_templates(
+                        self.data.get("message").get("hair_type"),
+                        self.data.get("message").get("hair_length"),
+                        self.data.get("message").get("hair_color"),
+                        self.data.get("message").get("gender")
+                    )
+                    self.request.send(pickle.dumps({
+                        'command': 'FINDED_TEMPLATES',
+                        'message': {
+                            'paths_to_image': result
+                        }
+                    }))
             else:
                 break
         print('Разрыв соединения с ', self.client_address[0])

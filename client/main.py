@@ -1,4 +1,5 @@
 import socket
+import pickle
 from client.interfaces import ShowWindow
 
 license_key = None
@@ -19,29 +20,20 @@ class ServerFunction:
         result = self.sock.connect_ex(('localhost', 10000))
         if result:
             return {"status": False, "message": "Подключение к серверу отсутствует.\nСервер временно выключен"}
+        else:
+            return {"status": True}
 
     # Функция закрытия соединения
     def __disconnect(self):
-        self.sock.sendall(bytes("GOODBYE", 'utf-8'))
+        self.sock.sendall(pickle.dumps({
+            'command': 'GOODBYE'
+        }))
         self.sock.close()
 
     # Функция отправки даных на сервер
-    def __send_data(self, command, data=[]):
-        '''
-
-        :param command: Команда для сервера, находящаяся перед разделителем ";"
-        :param data: Данные (сообщение) для сервера
-        :return: Ответ от сервера
-        '''
-
-        # В случае, если данных для команды много, то формируем запрос иначе
-        if len(data) > 1:
-            data = '=>'.join(data)
-        else:
-            data = data[0]
-
-        self.sock.sendall(bytes("{}=>{}".format(command, data), 'utf-8'))
-        return self.sock.recv(1024).decode()
+    def __send_data(self, data={'command': None, 'message': None}):
+        self.sock.sendall(pickle.dumps(data))
+        return pickle.loads(self.sock.recv(4096))
 
     #  Функция проверка статуса лицензии
     def get_license_status(self):
@@ -59,32 +51,61 @@ class ServerFunction:
                 license_key = file.readline()
                 file.close()
 
+        result = self.__connection()
         # Выполняем подключение к базе данных
-        if self.__connection():
-            return {"status": False, "message": "Подключение к серверу отсутствует.\nСервер временно выключен"}
+        if result.get("status") is not True:
+            return result
 
         # Так как установлено соединение с сервером, то необходимо проверить лицензию по ключу
         # Если срок не истек, то разрешаем пользоваться программой, иначе выходим из программы
-        received = self.__send_data('CHECK_LICENSE', [license_key])
-
-        if received == "VERIFIED":
-            self.__disconnect()
+        received = self.__send_data(data={
+            'command': 'CHECK_LICENSE',
+            'message': {
+                'license_key': license_key
+            }
+        })
+        self.__disconnect()
+        if received.get("command") == "VERIFIED":
             return {"status": True, "message": "Лицензия подтверждена"}
         else:
             return {"status": False, "message": "У вас нет лицензии!"}
 
     # Функция оценки результатов
     def set_rating(self, rating='positive'):
-        global license_key
+        result = self.__connection()
         # Выполняем подключение к базе данных
-        if self.__connection():
-            return {"status": False, "message": "Подключение к серверу отсутствует.\nСервер временно выключен"}
+        if result.get("status") is not True:
+            return result
 
-        received = self.__send_data('RATING', [rating, 'haircut'])
-        if received == 'RATING-ADDED':
+        received = self.__send_data(data={
+            'command': 'RATING',
+            'message': {
+                'rating': rating,
+                'service': 'haircut'
+            }
+        })
+        self.__disconnect()
+        if received.get("command") == 'RATING-ADDED':
             return {"status": True, "message": "Спасибо за оценку!\nГолос учтен"}
         else:
             return {"status": False, "message": "Произошла ошибки при оценке!"}
+
+    # Функция для получения списка фотографий выборки
+    def get_templates(self, params=[]):
+        result = self.__connection()
+        if result.get("status") is not True:
+            return result
+
+        received = self.__send_data(data={
+            'command': 'GET_TEMPLATES',
+            'message': {
+                'hair_type': 'mixed',
+                'hair_length': 'long',
+                'hair_color': 'Orange-Brown',
+                'gender': 'women',
+            }
+        })
+        self.__disconnect()
 
 
 if __name__ == "__main__":
@@ -96,3 +117,6 @@ if __name__ == "__main__":
         ShowWindow.show_error_win(error_message=result.get("message"))
     else:
         ShowWindow.show_vote_win(server_class=server_class)
+
+    #print(server_class.get_templates(params=['mixed', 'long', 'Orange-Brown', 'women']))
+

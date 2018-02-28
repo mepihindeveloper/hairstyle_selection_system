@@ -1,10 +1,15 @@
-import sys, os
+import sys
+import os
+import cv2
+import imutils
+import numpy as np
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from .user_interfaces._py.ui_design import Ui_MainWindow
-from .user_interfaces._py.ui_vote_dialog import Ui_VoteDialog
-from .user_interfaces._py.ui_error_dialog import Ui_ErrorDialog
-from .user_interfaces._py.ui_listviewimages import Ui_ListViewWindow
+from client.user_interfaces._py.ui_design import Ui_MainWindow
+from client.user_interfaces._py.ui_vote_dialog import Ui_VoteDialog
+from client.user_interfaces._py.ui_error_dialog import Ui_ErrorDialog
+from client.user_interfaces._py.ui_listviewimages import Ui_ListViewWindow
+from client.user_interfaces._py.ui_web_cam import Ui_WebCamWindow
 
 
 '''
@@ -181,6 +186,11 @@ class MainWin(QtWidgets.QMainWindow):
         # self.window.show()
 
 
+'''
+    Класс отображения галереи фотографий после поиска
+'''
+
+
 class GalleryWin(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)
@@ -219,6 +229,45 @@ class GalleryWin(QtWidgets.QMainWindow):
 
 
 '''
+    Основной класс для работы с интерфейсом камеры
+'''
+
+
+class WebCamWin(QtWidgets.QMainWindow):
+    def __init__(self, parent=None, video_class=None):
+        QtWidgets.QWidget.__init__(self, parent)
+        self.ui = Ui_WebCamWindow()
+        self.ui.setupUi(self)
+
+        # Отключаем возможность изменения разамера окна
+        self.setFixedSize(self.size())
+
+        self.ui.ui_makePhoto.clicked.connect(self.crop_face)
+
+        self.video = video_class(cv2.VideoCapture(0))
+
+        self._timer = QtCore.QTimer(self)
+        self._timer.timeout.connect(self.play)
+        self._timer.start(27)
+        self.update()
+
+    def play(self):
+        try:
+            self.video.capture_next_frame()
+            pixmap = self.video.convert_frame().get("img")
+            self.ui.videoFrame.setPixmap(
+                pixmap
+            )
+            self.ui.videoFrame.setScaledContents(True)
+        except TypeError:
+            print("No frame")
+
+    def crop_face(self):
+        self.video.get_face(self.video.convert_frame().get("face"))
+        self.close()
+
+
+'''
     Основной класс для манипуляций со всеми окнами приложения
 '''
 
@@ -249,5 +298,12 @@ class ShowWindow:
     def show_gallery_win():
         app = QtWidgets.QApplication(sys.argv)
         my_app = GalleryWin()
+        my_app.show()
+        sys.exit(app.exec_())
+
+    @staticmethod
+    def show_web_cam_win(video_class):
+        app = QtWidgets.QApplication(sys.argv)
+        my_app = WebCamWin(video_class=video_class)
         my_app.show()
         sys.exit(app.exec_())

@@ -32,11 +32,11 @@ hair_length_associate = {
 class Initialization:
     # Параметры системы инициализации
     params = {
-        'path_to_hairstyles': './hairstyle_images',
+        'path_to_hairstyles': 'hairstyle_images',
         'path_to_men_hairstyles': "/men",
         'path_to_women_hairstyles': "/women",
         'hair_types': ["normal", "greasy", "dry", "mixed"],
-        'database': './database/main_db.db',
+        'database': 'database/main_db.db',
         'debug': False
     }
 

@@ -11,8 +11,9 @@ license_key = None
 '''
 
 
-class ServerFunction:
-    sock = None
+class ServerFunctions:
+    def __init__(self):
+        self.sock = None
 
     # Функция установки соединения с сервером
     def __connection(self):
@@ -103,10 +104,12 @@ class ServerFunction:
         })
         self.__disconnect()
 
+        return received
+
 
 '''
     Вспомогательный класс для работы с камерой
-    Включает в себя наложения и прочие функции для работы именно с видеопотоком
+    Включает в себя наложения и прочие функции для работы именно с видеопотоком и элементами
 '''
 
 
@@ -199,17 +202,18 @@ class Video:
         cv2.imwrite("temp.png", image)
 
 
+
 if __name__ == "__main__":
     app = my_app = None
-    server_class = ServerFunction()
-    result = server_class.get_license_status()
+    server_functions = ServerFunctions()
+    result = server_functions.get_license_status()
 
-    # if result.get("status") is not True:
-    #     ShowWindow.show_error_win(error_message=result.get("message"))
-    # else:
-    #     #ShowWindow.show_vote_win(server_class=server_class)
-    #     ShowWindow.show_main_win(server_class=server_class)
-    #
+    if result.get("status") is not True:
+        ShowWindow.show_error_win(error_message=result.get("message"))
+    else:
+        #ShowWindow.show_vote_win(server_class=server_class)
+        ShowWindow.show_main_win(server_class=server_functions)
+
     #ShowWindow.show_gallery_win()
     #print(server_class.get_templates(params=['mixed', 'long', 'Orange-Brown', 'women']))
     #ShowWindow.show_web_cam_win(video_class=Video)

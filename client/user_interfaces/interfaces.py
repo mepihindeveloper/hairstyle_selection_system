@@ -80,20 +80,18 @@ class VoteWin(QtWidgets.QMainWindow):
 
 
 class MainWin(QtWidgets.QMainWindow):
-    server_class = None
-    params = {
-        'hair_type': 'normal',
-        'hair_length': 'short',
-        'hair_color': 'Red',
-        'gender': 'women'
-    }
-
     def __init__(self, parent=None, server_class=None):
-        self.server_class = server_class
-
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.server_class = server_class
+        self.params = {
+            'hair_type': 'normal',
+            'hair_length': 'short',
+            'hair_color': 'Red',
+            'gender': 'women'
+        }
 
         # Отключаем возможность изменения разамера окна
         self.setFixedSize(self.size())
@@ -175,15 +173,9 @@ class MainWin(QtWidgets.QMainWindow):
 
     # Функция запуска поиска
     def start_search(self):
-        pass
-        # print("Переменные: ", hair_type, color, hair_length)
-        # searcher = Searcher()
-        # photos = searcher.scan_dir()
-        # print(photos)
-        # self.window = QtWidgets.QMainWindow()
-        # self.ui = Ui_ListViewWindow()
-        # self.ui.setupUi(self.window)
-        # self.window.show()
+        templates = self.server_class.get_templates(self.params).get("message").get("paths_to_image")
+        print(templates)
+        GalleryWin(self, templates=templates).show()
 
 
 '''
@@ -192,7 +184,7 @@ class MainWin(QtWidgets.QMainWindow):
 
 
 class GalleryWin(QtWidgets.QMainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, templates=None):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_ListViewWindow()
         self.ui.setupUi(self)
@@ -208,15 +200,8 @@ class GalleryWin(QtWidgets.QMainWindow):
 
         #self.ui.listWidget.itemClicked.connect(self.item_click)
 
-        dir_and_subdir_templates = [
-            os.path.join("../server/hairstyle_images/women", name)
-            for dir_path, dirs, files in
-            os.walk("../server/hairstyle_images/women")
-            for name in files
-            if name.endswith((".jpg", ".png", ".jpeg"))
-        ]
-
-        for url in dir_and_subdir_templates:
+        for url in templates:
+            url = '../server/' + url
             icon = QtGui.QIcon(url)
             pixmap = icon.pixmap(150, 150)
             icon = QtGui.QIcon(pixmap)
@@ -295,7 +280,7 @@ class ShowWindow:
         sys.exit(app.exec_())
 
     @staticmethod
-    def show_gallery_win():
+    def show_gallery_win(parent=None):
         app = QtWidgets.QApplication(sys.argv)
         my_app = GalleryWin()
         my_app.show()

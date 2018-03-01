@@ -113,7 +113,7 @@ class ServerFunctions:
 '''
 
 
-class Video:
+class ImageProcessing:
     def __init__(self, capture):
         self.capture = capture
         self.currentFrame = np.array([])
@@ -201,6 +201,29 @@ class Video:
 
         cv2.imwrite("temp.png", image)
 
+    def overlay_face_to_hair(self, hair_image_path):
+        '''
+
+        :param hair_image_path: Путь к файлу с прической
+        :return: готовая фотография
+        '''
+        face_img = cv2.imread("client/temp.png", -1)
+        hair_image = cv2.imread(hair_image_path, -1)
+
+        x_offset = int((hair_image.shape[1] / 2) - (face_img.shape[1] / 2))
+        y_offset = int((hair_image.shape[0] / 2) - (face_img.shape[0] / 2))
+
+        print(x_offset, y_offset)
+
+        y1, y2 = y_offset, y_offset + face_img.shape[0]
+        x1, x2 = x_offset, x_offset + face_img.shape[1]
+
+        alpha_s = face_img[:, :, 3] / 255.0
+        alpha_l = 1.0 - alpha_s
+
+        for c in range(0, 3):
+            hair_image[y1:y2, x1:x2, c] = (alpha_s * face_img[:, :, c] + alpha_l * hair_image[y1:y2, x1:x2, c])
+
 
 
 if __name__ == "__main__":
@@ -216,4 +239,4 @@ if __name__ == "__main__":
 
     #ShowWindow.show_gallery_win()
     #print(server_class.get_templates(params=['mixed', 'long', 'Orange-Brown', 'women']))
-    ShowWindow.show_web_cam_win(video_class=Video)
+    ShowWindow.show_web_cam_win(video_class=ImageProcessing)

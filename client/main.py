@@ -213,8 +213,6 @@ class ImageProcessing:
         x_offset = int((hair_image.shape[1] / 2) - (face_img.shape[1] / 2))
         y_offset = int((hair_image.shape[0] / 2) - (face_img.shape[0] / 2))
 
-        print(x_offset, y_offset)
-
         y1, y2 = y_offset, y_offset + face_img.shape[0]
         x1, x2 = x_offset, x_offset + face_img.shape[1]
 

@@ -66,6 +66,7 @@ class ServerWin(QtWidgets.QMainWindow):
         self.setFixedSize(self.size())
         self.ui.ui_StartServer.clicked.connect(self.server_start)
         self.ui.ui_StopServer.clicked.connect(self.server_stop)
+        self.ui.ui_ArchivesOpen.clicked.connect(self.start_archives_utility)
 
     def server_start(self):
         result = self.server.start()
@@ -74,6 +75,11 @@ class ServerWin(QtWidgets.QMainWindow):
     def server_stop(self):
         result = self.server.stop()
         QtWidgets.QMessageBox.information(self, "Информация о сервере", result.get("message"))
+
+    def start_archives_utility(self):
+        self.hide()
+        os.system("python backup.py")
+        self.show()
 
 
 class ShowWindow:

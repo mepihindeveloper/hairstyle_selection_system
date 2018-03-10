@@ -3,6 +3,7 @@ import os
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 from server.user_interfaces._py.ui_archives import Ui_Archives
+from server.user_interfaces._py.ui_server_main import Ui_ServerMain
 
 
 class ArchivesWin(QtWidgets.QMainWindow):
@@ -54,10 +55,38 @@ class ArchivesWin(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.information(self, "Информация о действии", result.get("message"))
 
 
+class ServerWin(QtWidgets.QMainWindow):
+    def __init__(self, parent=None, server=None):
+        QtWidgets.QWidget.__init__(self, parent)
+        self.ui = Ui_ServerMain()
+        self.ui.setupUi(self)
+        self.server = server()
+
+        # Отключаем возможность изменения разамера окна
+        self.setFixedSize(self.size())
+        self.ui.ui_StartServer.clicked.connect(self.server_start)
+        self.ui.ui_StopServer.clicked.connect(self.server_stop)
+
+    def server_start(self):
+        result = self.server.start()
+        QtWidgets.QMessageBox.information(self, "Информация о сервере", result.get("message"))
+
+    def server_stop(self):
+        result = self.server.stop()
+        QtWidgets.QMessageBox.information(self, "Информация о сервере", result.get("message"))
+
+
 class ShowWindow:
     @staticmethod
     def show_archive_win(backup_class=None):
         app = QtWidgets.QApplication(sys.argv)
         my_app = ArchivesWin(backup_class=backup_class)
+        my_app.show()
+        sys.exit(app.exec_())
+
+    @staticmethod
+    def show_server_main_win(server=None):
+        app = QtWidgets.QApplication(sys.argv)
+        my_app = ServerWin(server=server)
         my_app.show()
         sys.exit(app.exec_())

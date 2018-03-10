@@ -1,10 +1,14 @@
+# coding: utf8
 import socketserver
 import sqlite3
 import datetime
 import pickle
+import threading
+
+from server.user_interfaces.interfaces import ShowWindow
 
 
-class __Handler(socketserver.BaseRequestHandler):
+class Handler(socketserver.BaseRequestHandler):
     params = {
         'database': './database/main_db.db'
     }
@@ -146,6 +150,29 @@ class __Handler(socketserver.BaseRequestHandler):
         self.__disconnect()
 
 
-server = socketserver.TCPServer(('localhost', 10000), __Handler)
-print('Сервер запущен')
-server.serve_forever()
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    pass
+
+
+class Server:
+    server = None
+
+    def start(self):
+        self.server = ThreadedTCPServer(('localhost', 10000), Handler)
+
+        ip, port = self.server.server_address
+        server_thread = threading.Thread(target=self.server.serve_forever)
+        server_thread.daemon = True
+        server_thread.start()
+        print("Сервер работает в потоке:", server_thread.name)
+        return {"status": True, "message": "Сервер работает в потоке: {}".format(server_thread.name)}
+
+    def stop(self):
+        self.server.shutdown()
+        self.server.server_close()
+        print('Сервер остановлен')
+        return {"status": False, "message": "Сервер остановлен"}
+
+
+if __name__ == '__main__':
+    ShowWindow.show_server_main_win(server=Server)

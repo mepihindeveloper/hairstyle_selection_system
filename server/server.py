@@ -20,27 +20,32 @@ class __Handler(socketserver.BaseRequestHandler):
         self.cursor.close()
         self.connection.close()
 
-    def __add_rating_to_db(self, rating, service):
+    def __add_rating_to_db(self, client_id, rating, service):
         # Устанавливаем соединение
         self.__connection()
         date_now = datetime.datetime.now()
 
         self.cursor.execute(
-            "SELECT * FROM statistics WHERE date = '{}'".format(
-                date_now.strftime("%Y-%m-%d"))
+            "SELECT * FROM local_statistics WHERE date = '{}' AND client_id='{}'".format(
+                date_now.strftime("%Y-%m-%d"),
+                client_id
+            )
         )
         row = self.cursor.fetchone()
         if row is None:
             self.cursor.execute(
-                "INSERT INTO statistics (date, service) VALUES ('{}', '{}')".format(
+                "INSERT INTO local_statistics (client_id, date, " + rating + " ,service) VALUES ('{}', '{}', '1' ,'{}')".format(
+                    client_id,
                     date_now.strftime("%Y-%m-%d"),
                     service
             ))
 
         else:
             self.cursor.execute(
-                "UPDATE statistics SET " + rating + " = " + rating + " + 1 WHERE date = '{}'".format(
-                    date_now.strftime("%Y-%m-%d"))
+                "UPDATE local_statistics SET " + rating + " = " + rating + " + 1 WHERE date = '{}' AND client_id='{}'".format(
+                    date_now.strftime("%Y-%m-%d"),
+                    client_id
+                )
             )
         self.connection.commit()
 
@@ -74,7 +79,7 @@ class __Handler(socketserver.BaseRequestHandler):
     def get_templates(self, hair_type, hair_length, hair_color, gender):
         self.__connection()
         self.cursor.execute(
-            "SELECT path_to_image FROM hairstyle_images "
+            "SELECT path_to_image FROM local_hairstyle_images "
             "WHERE hair_type = '{}' AND hair_length = '{}' AND hair_color = '{}' AND gender = '{}'".format(
                 hair_type,
                 hair_length,
@@ -115,6 +120,7 @@ class __Handler(socketserver.BaseRequestHandler):
                     break
                 elif self.data.get("command") == 'RATING':
                     self.__add_rating_to_db(
+                        self.data.get("message").get("client_id"),
                         self.data.get("message").get("rating"),
                         self.data.get("message").get("service")
                     )

@@ -1,9 +1,11 @@
 import socket
 import pickle
+import configparser
 
 from client.user_interfaces.interfaces import *
 
-license_key = None
+#license_key = None
+client_settings = {}
 
 '''
     Класс для работы с сервером
@@ -38,14 +40,12 @@ class ServerFunctions:
         return pickle.loads(self.sock.recv(4096))
 
     #  Функция проверка статуса лицензии
-    def get_license_status(self):
+    '''def get_license_status(self):
         global license_key
 
-        '''
-            Проверка файла лицензии на существование
-            Если есть, то запишем в переменную ее содержимое
-            Иначе вернем ошибку
-        '''
+        # Проверка файла лицензии на существование
+        # Если есть, то запишем в переменную ее содержимое
+        # Иначе вернем ошибку
         try: file = open('license', 'r')
         except IOError as error: return {"status": False, "message": "Файл лицензии отсутствует!\n{}".format(error)}
         else:
@@ -71,9 +71,12 @@ class ServerFunctions:
             return {"status": True, "message": "Лицензия подтверждена"}
         else:
             return {"status": False, "message": "У вас нет лицензии!"}
+    '''
 
     # Функция оценки результатов
     def set_rating(self, rating='positive'):
+        global client_settings
+
         result = self.__connection()
         # Выполняем подключение к базе данных
         if result.get("status") is not True:
@@ -82,6 +85,7 @@ class ServerFunctions:
         received = self.__send_data(data={
             'command': 'RATING',
             'message': {
+                'client_id': client_settings.get('id'),
                 'rating': rating,
                 'service': 'haircut'
             }
@@ -223,11 +227,51 @@ class ImageProcessing:
             hair_image[y1:y2, x1:x2, c] = (alpha_s * face_img[:, :, c] + alpha_l * hair_image[y1:y2, x1:x2, c])
 
 
+'''
+    Работа с INI файлами конфигурации
+'''
+
+
+class Ini:
+    def __init__(self):
+        self.config = configparser.ConfigParser()
+        self.file_name = 'settings.ini'
+
+    def read_file(self):
+        try:
+            file = open(self.file_name, 'r')
+        except IOError as error:
+            return {"status": False, "message": "Файл настроек отсутствует!\n{}".format(error)}
+        else:
+            with file:
+                self.config.read(self.file_name)
+                file.close()
+                return {"status": True}
+
+    def get_value(self, section, key):
+        file_exist = self.read_file()
+        if file_exist.get("status") is True:
+            return {"status": True, "value": self.config[section][key]}
+        else:
+            return file_exist
+
 
 if __name__ == "__main__":
     app = my_app = None
+    ini = Ini()
+    client_id = ini.get_value("client_settings", 'id')
+    place = ini.get_value("client_settings", 'place')
+
+    if client_id.get("status") is True and place.get("status") is True:
+        client_settings.update({
+            'id': client_id.get("value"),
+            'place': place.get("value")
+        })
+
     server_functions = ServerFunctions()
-    result = server_functions.get_license_status()
+
+    #server_functions = ServerFunctions()
+    #result = server_functions.get_license_status()
 
     # if result.get("status") is not True:
     #     ShowWindow.show_error_win(error_message=result.get("message"))
@@ -237,4 +281,4 @@ if __name__ == "__main__":
 
     #ShowWindow.show_gallery_win()
     #print(server_class.get_templates(params=['mixed', 'long', 'Orange-Brown', 'women']))
-    ShowWindow.show_web_cam_win(video_class=ImageProcessing)
+    #ShowWindow.show_web_cam_win(video_class=ImageProcessing)

@@ -201,7 +201,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Система подбора причесок"))
-        self.uielem_startSearch.setText(_translate("MainWindow", "Поиск"))
+        self.uielem_startSearch.setText(_translate("MainWindow", "Сделать фото"))
         self.ui_hairTypeComboBox.setItemText(0, _translate("MainWindow", "Нормальные"))
         self.ui_hairTypeComboBox.setItemText(1, _translate("MainWindow", "Жирные"))
         self.ui_hairTypeComboBox.setItemText(2, _translate("MainWindow", "Сухие"))

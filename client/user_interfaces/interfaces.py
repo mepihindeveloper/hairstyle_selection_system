@@ -1,8 +1,7 @@
 import sys
-import os
+import numpy as np
 import cv2
 import imutils
-import numpy as np
 
 from PyQt5 import QtWidgets, QtGui, QtCore
 from client.user_interfaces._py.ui_design import Ui_MainWindow
@@ -10,6 +9,122 @@ from client.user_interfaces._py.ui_vote_dialog import Ui_VoteDialog
 from client.user_interfaces._py.ui_error_dialog import Ui_ErrorDialog
 from client.user_interfaces._py.ui_listviewimages import Ui_ListViewWindow
 from client.user_interfaces._py.ui_web_cam import Ui_WebCamWindow
+
+
+'''
+    Вспомогательный класс для работы с камерой
+    Включает в себя наложения и прочие функции для работы именно с видеопотоком и элементами
+'''
+
+
+class ImageProcessing:
+    def __init__(self, capture):
+        self.capture = capture
+        self.currentFrame = np.array([])
+        self.face = None
+        self.overlay_image = cv2.imread("image_2.png", -1)
+
+    def capture_next_frame(self):
+        """
+        capture frame and reverse RBG BGR and return opencv image
+        """
+        (ret, readFrame) = self.capture.read()
+        if ret is True:
+            readFrame = cv2.flip(readFrame, 1)
+            self.face = self.blend_transparent(bg_image=readFrame, overlay_t_img=self.overlay_image)
+            self.currentFrame = cv2.cvtColor(self.face, cv2.COLOR_BGR2RGB)
+
+    def convert_frame(self):
+        """     converts frame to format suitable for QtGui            """
+        try:
+            height, width = self.currentFrame.shape[:2]
+            img = QtGui.QImage(self.currentFrame,
+                               width,
+                               height,
+                               QtGui.QImage.Format_RGB888)
+            img = QtGui.QPixmap.fromImage(img)
+            self.previousFrame = self.currentFrame
+            return {'img': img, 'face': self.face}
+        except:
+            return None
+
+    def blend_transparent(self, bg_image, overlay_t_img):
+        # Разделите маску прозрачности из информации о цвете
+        overlay_img = overlay_t_img[:, :, :3]  # Возьмите плоскости BRG
+        overlay_mask = overlay_t_img[:, :, 3:]  # И alpha плоскость
+
+        # Снова вычислите обратную маску
+        background_mask = 255 - overlay_mask
+
+        # Поверните маски в три канала, чтобы мы могли использовать их в качестве весов
+        overlay_mask = cv2.cvtColor(overlay_mask, cv2.COLOR_GRAY2BGR)
+        background_mask = cv2.cvtColor(background_mask, cv2.COLOR_GRAY2BGR)
+
+        # Создайте замаскированное изображение лица и замаскируйте наложение
+        # Мы преобразуем изображения в плавающие точки в диапазоне 0.0 - 1.0
+        face_part = (bg_image * (1 / 255.0)) * (background_mask * (1 / 255.0))
+        overlay_part = (overlay_img * (1 / 255.0)) * (overlay_mask * (1 / 255.0))
+
+        # И, наконец, просто добавьте их вместе и измените размер до 8-битного целого изображения
+        return np.uint8(cv2.addWeighted(face_part, 255.0, overlay_part, 255.0, 0.0))
+
+    def get_face(self, face):
+        # Преобразуем в серые тона
+        gray = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+        # Делаем небольшое размытие, чтобы исключи микроразрывы контура
+        gray = cv2.medianBlur(gray, 3)
+
+        (ret, thresh) = cv2.threshold(gray, 1, 255, 0)
+        (im2, contours, hierarchy) = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+        # Порог изображения, затем выполните серию эрозий + растяжения, чтобы удалить любые небольшие области шума
+        thresh = cv2.threshold(gray, 45, 255, cv2.THRESH_BINARY)[1]
+        thresh = cv2.erode(thresh, None, iterations=2)
+        thresh = cv2.dilate(thresh, None, iterations=2)
+
+        # Найти контуры в пороговом изображении, а затем захватить самую большую
+        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+        c = max(cnts, key=cv2.contourArea)
+
+        (x, y, w, h) = cv2.boundingRect(c)
+        face = face[y: y + h, x: x + w]
+        cv2.imwrite("temp.png", face)
+
+        self.make_transparent("temp.png")
+
+    def make_transparent(self, image_path):
+        image = cv2.imread(image_path, 1)
+        tmp = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        _, alpha = cv2.threshold(tmp, 0, 255, cv2.THRESH_BINARY)
+        b, g, r = cv2.split(image)
+
+        rgba = [b, g, r, alpha]
+        image = cv2.merge(rgba, 4)
+
+        cv2.imwrite("temp.png", image)
+
+    def overlay_face_to_hair(self, hair_image_path):
+        '''
+
+        :param hair_image_path: Путь к файлу с прической
+        :return: готовая фотография
+        '''
+        face_img = cv2.imread("client/temp.png", -1)
+        hair_image = cv2.imread(hair_image_path, -1)
+
+        x_offset = int((hair_image.shape[1] / 2) - (face_img.shape[1] / 2))
+        y_offset = int((hair_image.shape[0] / 2) - (face_img.shape[0] / 2))
+
+        y1, y2 = y_offset, y_offset + face_img.shape[0]
+        x1, x2 = x_offset, x_offset + face_img.shape[1]
+
+        alpha_s = face_img[:, :, 3] / 255.0
+        alpha_l = 1.0 - alpha_s
+
+        for c in range(0, 3):
+            hair_image[y1:y2, x1:x2, c] = (alpha_s * face_img[:, :, c] + alpha_l * hair_image[y1:y2, x1:x2, c])
 
 
 '''
@@ -92,6 +207,7 @@ class MainWin(QtWidgets.QMainWindow):
             'hair_color': 'Red',
             'gender': 'women'
         }
+        self.is_photo_done = False
 
         # Отключаем возможность изменения разамера окна
         self.setFixedSize(self.size())
@@ -173,9 +289,16 @@ class MainWin(QtWidgets.QMainWindow):
 
     # Функция запуска поиска
     def start_search(self):
-        templates = self.server_class.get_templates(self.params).get("message").get("paths_to_image")
-        print(templates)
-        GalleryWin(self, templates=templates).show()
+        if self.is_photo_done is not True:
+            # Сначала фотографируем клиента
+            WebCamWin(self).show()
+            self.ui.uielem_startSearch.setText("Поиск")
+            self.is_photo_done = True
+        else:
+            # Производим поиск
+            templates = self.server_class.get_templates(self.params).get("message").get("paths_to_image")
+            print(templates)
+            GalleryWin(self, templates=templates).show()
 
 
 '''
@@ -219,17 +342,16 @@ class GalleryWin(QtWidgets.QMainWindow):
 
 
 class WebCamWin(QtWidgets.QMainWindow):
-    def __init__(self, parent=None, video_class=None):
+    def __init__(self, parent=None, ):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_WebCamWindow()
         self.ui.setupUi(self)
-
         # Отключаем возможность изменения разамера окна
         self.setFixedSize(self.size())
 
         self.ui.ui_makePhoto.clicked.connect(self.crop_face)
 
-        self.video = video_class(cv2.VideoCapture(0))
+        self.video = ImageProcessing(cv2.VideoCapture(0))
 
         self._timer = QtCore.QTimer(self)
         self._timer.timeout.connect(self.play)
@@ -257,38 +379,10 @@ class WebCamWin(QtWidgets.QMainWindow):
 '''
 
 
-class ShowWindow:
-    @staticmethod
-    def show_error_win(error_message):
-        app = QtWidgets.QApplication(sys.argv)
-        my_app = ErrorWin(error_message=error_message)
-        my_app.show()
-        sys.exit(app.exec_())
-
-    @staticmethod
-    def show_vote_win(server_class):
-        app = QtWidgets.QApplication(sys.argv)
-        my_app = VoteWin(server_class=server_class)
-        my_app.show()
-        sys.exit(app.exec_())
-
+class ShowWindow():
     @staticmethod
     def show_main_win(server_class):
         app = QtWidgets.QApplication(sys.argv)
         my_app = MainWin(server_class=server_class)
-        my_app.show()
-        sys.exit(app.exec_())
-
-    @staticmethod
-    def show_gallery_win(parent=None):
-        app = QtWidgets.QApplication(sys.argv)
-        my_app = GalleryWin()
-        my_app.show()
-        sys.exit(app.exec_())
-
-    @staticmethod
-    def show_web_cam_win(video_class):
-        app = QtWidgets.QApplication(sys.argv)
-        my_app = WebCamWin(video_class=video_class)
         my_app.show()
         sys.exit(app.exec_())

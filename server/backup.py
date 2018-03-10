@@ -3,6 +3,7 @@ import shutil
 import zipfile
 import datetime
 
+from server.user_interfaces.interfaces import ShowWindow
 
 '''
     Класс для работы с функцией резервирования и восстановления системы
@@ -62,27 +63,27 @@ class BackUp:
             self.zipdir(self.params.get("archive_files").get(goal).get("folder"), zipf)
             zipf.close()
 
-    # Функция удаления папки, перед восстановлением
-    def clear_dir(self, dir_path):
-        shutil.rmtree(dir_path, ignore_errors=True)
+        return {"status": True, "message": "Резервная копия успешно создана"}
 
     # Восстановленеи из архива
-    def restore(self, archive, goal):
+    def restore(self, archive):
         '''
         :param archive: Имя архива
         :param goal: цель (какой тип имеет объект восстановления (фото, сервер или клиент))
         :return:
         '''
-        folder = self.params.get("archive_files").get(goal).get("folder")
-        archive = self.params.get("folder")+archive
+        for goal in ('client', 'server'):
+            shutil.rmtree(self.params.get("archive_files").get(goal).get("folder"), ignore_errors=True)
 
-        zipf = zipfile.ZipFile(archive, 'r')
-        zipf.extractall("../")
-        zipf.close()
+            folder = self.params.get("archive_files").get(goal).get("folder")
+            archive = self.params.get("folder")+archive
+
+            zipf = zipfile.ZipFile(archive, 'r')
+            zipf.extractall("../")
+            zipf.close()
+
+            return {"status": True, "message": "Резервная копия успешно восстановлена"}
 
 
 if __name__ == '__main__':
-    BackUp().make_zip(goal="server")
-    #BackUp().clear_dir("./hairstyle_images")
-    #BackUp().restore("2018-3-10_hairstyle_images.zip", 'hairstyle_images')
-    #pass
+    ShowWindow.show_archive_win(backup_class=BackUp)

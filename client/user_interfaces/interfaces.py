@@ -93,6 +93,9 @@ class ImageProcessing:
 
         self.make_transparent("temp.png")
 
+    def release(self):
+        self.capture.release()
+
     def make_transparent(self, image_path):
         image = cv2.imread(image_path, 1)
         tmp = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -371,6 +374,7 @@ class WebCamWin(QtWidgets.QMainWindow):
 
     def crop_face(self):
         self.video.get_face(self.video.convert_frame().get("face"))
+        self.video.release()
         self.close()
 
 

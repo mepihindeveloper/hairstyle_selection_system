@@ -3,7 +3,7 @@ import shutil
 import zipfile
 import datetime
 
-from server.user_interfaces.interfaces import ShowWindow
+from user_interfaces.interfaces import ShowWindow
 
 '''
     Класс для работы с функцией резервирования и восстановления системы

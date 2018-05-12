@@ -2,7 +2,7 @@ import socket
 import pickle
 import configparser
 
-from client.user_interfaces.interfaces import ShowWindow
+from user_interfaces.interfaces import ShowWindow
 
 #license_key = None
 client_settings = {}

@@ -4,11 +4,11 @@ import cv2
 import imutils
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from client.user_interfaces._py.ui_design import Ui_MainWindow
-from client.user_interfaces._py.ui_vote_dialog import Ui_VoteDialog
-from client.user_interfaces._py.ui_error_dialog import Ui_ErrorDialog
-from client.user_interfaces._py.ui_listviewimages import Ui_ListViewWindow
-from client.user_interfaces._py.ui_web_cam import Ui_WebCamWindow
+from ._py.ui_design import Ui_MainWindow
+from ._py.ui_vote_dialog import Ui_VoteDialog
+from ._py.ui_error_dialog import Ui_ErrorDialog
+from ._py.ui_listviewimages import Ui_ListViewWindow
+from ._py.ui_web_cam import Ui_WebCamWindow
 
 
 '''

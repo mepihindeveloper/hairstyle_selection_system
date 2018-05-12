@@ -2,8 +2,8 @@ import sys
 import os
 
 from PyQt5 import QtWidgets, QtGui, QtCore
-from server.user_interfaces._py.ui_archives import Ui_Archives
-from server.user_interfaces._py.ui_server_main import Ui_ServerMain
+from ._py.ui_archives import Ui_Archives
+from ._py.ui_server_main import Ui_ServerMain
 
 
 class ArchivesWin(QtWidgets.QMainWindow):

@@ -5,7 +5,7 @@ import datetime
 import pickle
 import threading
 
-from server.user_interfaces.interfaces import ShowWindow
+from user_interfaces.interfaces import ShowWindow
 
 
 class Handler(socketserver.BaseRequestHandler):

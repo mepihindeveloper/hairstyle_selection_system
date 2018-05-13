@@ -327,7 +327,7 @@ class GalleryWin(QtWidgets.QMainWindow):
         #self.ui.listWidget.itemClicked.connect(self.item_click)
 
         for url in templates:
-            url = '../server/' + url
+            #url = '\\\\DESKTOP-8LL4A0U\\' + url
             icon = QtGui.QIcon(url)
             pixmap = icon.pixmap(150, 150)
             icon = QtGui.QIcon(pixmap)

@@ -4,9 +4,33 @@ import sqlite3
 import datetime
 import pickle
 import threading
+import configparser
 
 from user_interfaces.interfaces import ShowWindow
 
+
+class Ini:
+    def __init__(self):
+        self.config = configparser.ConfigParser()
+        self.file_name = 'settings.ini'
+
+    def read_file(self):
+        try:
+            file = open(self.file_name, 'r')
+        except IOError as error:
+            return {"status": False, "message": "Файл настроек отсутствует!\n{}".format(error)}
+        else:
+            with file:
+                self.config.read(self.file_name)
+                file.close()
+                return {"status": True}
+
+    def get_value(self, section, key):
+        file_exist = self.read_file()
+        if file_exist.get("status") is True:
+            return {"status": True, "value": self.config[section][key]}
+        else:
+            return file_exist
 
 class Handler(socketserver.BaseRequestHandler):
     params = {
@@ -93,8 +117,11 @@ class Handler(socketserver.BaseRequestHandler):
         )
         row = self.cursor.fetchone()
         templates = []
+        ini = Ini()
+        homegroup = ini.get_value("server_settings", 'homegroup')
         while row is not None:
-            templates.append(row[0])
+            link = homegroup.get("value") + "\\" + row[0]
+            templates.append(link)
             row = self.cursor.fetchone()
 
         return templates

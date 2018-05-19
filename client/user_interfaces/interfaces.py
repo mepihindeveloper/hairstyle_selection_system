@@ -89,9 +89,9 @@ class ImageProcessing:
 
         (x, y, w, h) = cv2.boundingRect(c)
         face = face[y: y + h, x: x + w]
-        cv2.imwrite("temp.png", face)
+        cv2.imwrite("tmp_images/temp.png", face)
 
-        self.make_transparent("temp.png")
+        self.make_transparent("tmp_images/temp.png")
 
     def release(self):
         self.capture.release()
@@ -326,14 +326,63 @@ class GalleryWin(QtWidgets.QMainWindow):
 
         #self.ui.listWidget.itemClicked.connect(self.item_click)
 
+        # for url in templates:
+        #     #url = '\\\\DESKTOP-8LL4A0U\\' + url
+        #     icon = QtGui.QIcon(url)
+        #     pixmap = icon.pixmap(150, 150)
+        #     icon = QtGui.QIcon(pixmap)
+        #     item = QtWidgets.QListWidgetItem(url)
+        #     item.setIcon(icon)
+        #     self.ui.listWidget.addItem(QtWidgets.QListWidgetItem(item))
+
         for url in templates:
-            #url = '\\\\DESKTOP-8LL4A0U\\' + url
-            icon = QtGui.QIcon(url)
+            image = self.concatenation('\\' + url)
+            icon = QtGui.QIcon(image)
             pixmap = icon.pixmap(150, 150)
             icon = QtGui.QIcon(pixmap)
-            item = QtWidgets.QListWidgetItem(url)
+            item = QtWidgets.QListWidgetItem("Пример прически")
             item.setIcon(icon)
             self.ui.listWidget.addItem(QtWidgets.QListWidgetItem(item))
+
+    def concatenation(self, hair_photo_path):
+        face_img = cv2.imread("tmp_images/temp.png", -1)
+        hair_image = cv2.imread(hair_photo_path, -1)
+        blank_image = np.zeros( ( hair_image.shape ), np.uint8)
+        blank_image = cv2.resize(blank_image, (hair_image.shape[1] * 2, hair_image.shape[0] * 2))
+
+        face_offset_y = int(face_img.shape[0] / 2 - face_img.shape[0] / 5)
+
+        y_offset = int((blank_image.shape[0] / 2) - (face_img.shape[0] / 2)) - face_offset_y
+        x_offset = int((blank_image.shape[1] / 2) - (face_img.shape[1] / 2))
+
+        blank_image[
+        y_offset: y_offset + face_img.shape[0],
+        x_offset: x_offset + face_img.shape[1]
+        ] = face_img
+
+        x_offset = int(
+            (blank_image.shape[1] / 2) - (hair_image.shape[1] / 2)
+        )
+        y_offset = 0
+
+        y1, y2 = y_offset, y_offset + hair_image.shape[0]
+        x1, x2 = x_offset, x_offset + hair_image.shape[1]
+
+        alpha_s = hair_image[:, :, 3] / 255.0
+        alpha_l = 1.0 - alpha_s
+
+        for c in range(0, 3):
+            blank_image[
+                y1:y2,
+                x1:x2,
+                c
+            ] = (alpha_s * hair_image[:, :, c] + alpha_l * blank_image[y1:y2, x1:x2, c])
+
+        image_path = 'tmp_images/' + hair_photo_path.split('/')[-1]
+        print("IMG_PATH", image_path)
+        cv2.imwrite(image_path, blank_image)
+
+        return image_path
 
     # def item_click(self, item):
     #     print(str(item.text()))

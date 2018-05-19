@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 
 def show(index):
-    face_img = cv2.imread("client/temp.png", -1)
+    face_img = cv2.imread("client/tmp_images/temp.png", -1)
     hair_image = cv2.imread('server/hairstyle_images/women/%i.png' % (index + 1), -1)
     blank_image = np.zeros((hair_image.shape), np.uint8)
     blank_image = cv2.resize(blank_image, (hair_image.shape[1]*2, hair_image.shape[0]*2))
@@ -16,11 +16,6 @@ def show(index):
         y_offset: y_offset + face_img.shape[0],
         x_offset: x_offset + face_img.shape[1]
     ] = face_img
-
-    # hair_image = cv2.resize(
-    #     hair_image,
-    #     (face_img.shape[1] + int(face_img.shape[1]/4), hair_image.shape[0])
-    # )
 
     x_offset = int(
         (blank_image.shape[1] / 2) - (hair_image.shape[1] / 2)
@@ -41,6 +36,7 @@ def show(index):
         ] = (alpha_s * hair_image[:, :, c] + alpha_l * blank_image[y1:y2, x1:x2, c])
 
     cv2.imshow("s", blank_image)
+    #cv2.imwrite("1.png",blank_image)
     cv2.waitKey()
 
 for i in range(10):

@@ -64,6 +64,7 @@ class ServerWin(QtWidgets.QMainWindow):
 
         # Отключаем возможность изменения разамера окна
         self.setFixedSize(self.size())
+        self.ui.ui_StopServer.setEnabled(False)
         self.ui.ui_StartServer.clicked.connect(self.server_start)
         self.ui.ui_StopServer.clicked.connect(self.server_stop)
         self.ui.ui_ArchivesOpen.clicked.connect(self.start_archives_utility)
@@ -71,10 +72,14 @@ class ServerWin(QtWidgets.QMainWindow):
     def server_start(self):
         result = self.server.start()
         QtWidgets.QMessageBox.information(self, "Информация о сервере", result.get("message"))
+        self.ui.ui_StartServer.setEnabled(False)
+        self.ui.ui_StopServer.setEnabled(True)
 
     def server_stop(self):
         result = self.server.stop()
         QtWidgets.QMessageBox.information(self, "Информация о сервере", result.get("message"))
+        self.ui.ui_StartServer.setEnabled(True)
+        self.ui.ui_StopServer.setEnabled(False)
 
     def start_archives_utility(self):
         self.hide()

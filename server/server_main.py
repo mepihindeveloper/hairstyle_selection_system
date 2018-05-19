@@ -120,10 +120,10 @@ class Handler(socketserver.BaseRequestHandler):
         ini = Ini()
         homegroup = ini.get_value("server_settings", 'homegroup')
         while row is not None:
-            link = homegroup.get("value") + "\\" + row[0]
+            link = homegroup.get("value") + '/' + row[0]
             templates.append(link)
             row = self.cursor.fetchone()
-
+        #print(templates)
         return templates
 
     def handle(self):

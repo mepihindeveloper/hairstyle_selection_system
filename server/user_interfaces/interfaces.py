@@ -4,6 +4,7 @@ import os
 from PyQt5 import QtWidgets, QtGui, QtCore
 from ._py.ui_archives import Ui_Archives
 from ._py.ui_server_main import Ui_ServerMain
+from ._py.ui_initialization import Ui_Initialization
 
 
 class ArchivesWin(QtWidgets.QMainWindow):
@@ -68,6 +69,7 @@ class ServerWin(QtWidgets.QMainWindow):
         self.ui.ui_StartServer.clicked.connect(self.server_start)
         self.ui.ui_StopServer.clicked.connect(self.server_stop)
         self.ui.ui_ArchivesOpen.clicked.connect(self.start_archives_utility)
+        self.ui.ui_TemplatesUpdate.clicked.connect(self.start_initialization)
 
     def server_start(self):
         result = self.server.start()
@@ -86,12 +88,64 @@ class ServerWin(QtWidgets.QMainWindow):
         os.system("python backup.py")
         self.show()
 
+    def start_initialization(self):
+        self.hide()
+        os.system("python initialization.py")
+        self.show()
+
+
+class InitializationWin(QtWidgets.QMainWindow):
+    def __init__(self, parent=None, initialisation_class=None):
+        QtWidgets.QWidget.__init__(self, parent)
+        self.ui = Ui_Initialization()
+        self.ui.setupUi(self)
+        self.initialisation_class = initialisation_class
+        self.hair_type_name = 'normal'
+        self.i = 0
+
+        # Отключаем возможность изменения разамера окна
+        self.setFixedSize(self.size())
+
+        # подключение функций
+        self.ui.ui_HairType.currentIndexChanged.connect(self.change_hair_type)
+        self.ui.ui_SaveButton.clicked.connect(self.save_photo)
+
+        self.photos = self.initialisation_class.initialization_files()
+        self.change_photo(self.photos[self.i])
+
+    def change_photo(self, photo_url):
+        pixmap = QtGui.QPixmap(photo_url)
+        self.ui.ui_Image.setPixmap(pixmap)
+
+    # Функция смены типа волос
+    def change_hair_type(self):
+        hair_type_names = ["normal", "greasy", "dry", "mixed"]
+        self.hair_type_name = hair_type_names[self.ui.ui_HairType.currentIndex()]
+
+    def save_photo(self):
+        self.initialisation_class.generate_hairstyle_structure(
+            hair_type=self.hair_type_name,
+            template=self.photos[self.i]
+        )
+        if (self.i == (len(self.photos) -1)):
+            self.initialisation_class.save()
+            self.close()
+        else:
+            self.i += 1
+            self.change_photo(self.photos[self.i])
 
 class ShowWindow:
     @staticmethod
     def show_archive_win(backup_class=None):
         app = QtWidgets.QApplication(sys.argv)
         my_app = ArchivesWin(backup_class=backup_class)
+        my_app.show()
+        sys.exit(app.exec_())
+
+    @staticmethod
+    def show_initialization_win(initialisation_class=None):
+        app = QtWidgets.QApplication(sys.argv)
+        my_app = InitializationWin(initialisation_class=initialisation_class)
         my_app.show()
         sys.exit(app.exec_())
 

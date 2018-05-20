@@ -426,6 +426,9 @@ class WebCamWin(QtWidgets.QMainWindow):
         self.video.release()
         self.close()
 
+    def closeEvent(self, event):
+        self.video.release()
+
 
 '''
     Основной класс для манипуляций со всеми окнами приложения

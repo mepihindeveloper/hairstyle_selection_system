@@ -52,7 +52,7 @@ class ArchivesWin(QtWidgets.QMainWindow):
 
     def restore_archive(self):
         if self.item is not None:
-            result = self.backup_class.restore()
+            result = self.backup_class.restore(archive=self.item)
             QtWidgets.QMessageBox.information(self, "Информация о действии", result.get("message"))
 
 

@@ -106,7 +106,7 @@ class ImageProcessing:
         rgba = [b, g, r, alpha]
         image = cv2.merge(rgba, 4)
 
-        cv2.imwrite("temp.png", image)
+        cv2.imwrite(image_path, image)
 
     def overlay_face_to_hair(self, hair_image_path):
         '''
@@ -325,15 +325,6 @@ class GalleryWin(QtWidgets.QMainWindow):
         self.setAcceptDrops(False)
 
         #self.ui.listWidget.itemClicked.connect(self.item_click)
-
-        # for url in templates:
-        #     #url = '\\\\DESKTOP-8LL4A0U\\' + url
-        #     icon = QtGui.QIcon(url)
-        #     pixmap = icon.pixmap(150, 150)
-        #     icon = QtGui.QIcon(pixmap)
-        #     item = QtWidgets.QListWidgetItem(url)
-        #     item.setIcon(icon)
-        #     self.ui.listWidget.addItem(QtWidgets.QListWidgetItem(item))
 
         for url in templates:
             image = self.concatenation('\\' + url)

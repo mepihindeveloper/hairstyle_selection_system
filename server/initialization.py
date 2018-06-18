@@ -126,35 +126,6 @@ class Initialization:
 
         hairstyle_templates.get('women').get('templates').update(new_template)
         self.i += 1
-        # i = 0
-        # '''
-        #     Цикл прхода по всем шаблонам из найденных в dir_and_subdir_templates
-        #     Идет считываение типа волос путем ввода вручную
-        #     Процесс определения длины волос напрямую зависит от высоты фото (условие задачи и ее рациональность)
-        #     Процесс получения лидирующего цвета по HSV (для точности выделяется 3 цвета)
-        #     Формируется новый словарь по шаблону
-        #     Добавляется в общую структуру
-        # '''
-        # for template in dir_and_subdir_templates:
-        #     # hair_type = input("Введите тип волос (normal, greasy, dry, mixed): ")
-        #     # while hair_type not in self.params.get('hair_types'):
-        #     #    print("Ошибка: вы можете ввести только значения: normal, greasy, dry, mixed")
-        #     #    hair_type = input("Введите тип волос (normal, greasy, dry, mixed): ")
-        #
-        #     hair_type = random.choice(self.params.get('hair_types'))
-        #     length = self.__detect_hair_length(template)
-        #     color = self.__detect_primary_colors(template)[0]
-        #     new_template = {
-        #         'item_{}'.format(i): {
-        #             'path': template,
-        #             'type': hair_type,
-        #             'length': length,
-        #             'color': color
-        #         }
-        #     }
-        #
-        #     hairstyle_templates.get('women').get('templates').update(new_template)
-        #     i += 1
 
     # Функция определения длины волос
     def __detect_hair_length(self, single_template):

@@ -36,7 +36,7 @@ def show(index):
         ] = (alpha_s * hair_image[:, :, c] + alpha_l * blank_image[y1:y2, x1:x2, c])
 
     cv2.imshow("s", blank_image)
-    #cv2.imwrite("1.png",blank_image)
+    cv2.imwrite("%i.png" % (index + 1),blank_image)
     cv2.waitKey()
 
 for i in range(10):
